@@ -1,5 +1,4 @@
 import datetime
-
 from app import db
 
 user_temp_table = db.Table('user_temp', 
@@ -26,15 +25,14 @@ class User(db.Model):
 		# end your code before this line
 
 	def __repr__(self):
-		return '<name {} id {} >'.format(self.name, self.id) 
+		return '<name {} id {} and contact number {} >'.format(self.name, self.id, self.contact_number) 
 
 	def serialize(self):
 		# start your code after this line
 		return {
 			'name': self.name, 
 			'id':self.id,
-			
-			# 'contact_number': self.contact_number,
+			'contact_number': self.contact_number,
 		}
 		# end your code before this line
 
@@ -45,6 +43,7 @@ class Temperature(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 	temp_value = db.Column(db.Float, unique=False, nullable=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	
 	#many-to-many model
 	users = db.relationship('User', secondary=user_temp_table, back_populates='temperatures')
