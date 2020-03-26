@@ -45,9 +45,17 @@ def create_temp():
 	print('create_temp')
 
 	# start your code after this line
-
-	name = request.json['name'] 
-	temp = request.json['temp'] #find if id match based on user's name
+	if 'name' and 'temp' in request.json:
+		name = request.json['name']
+		temp_value = request.json['temp']
+	else:
+		return "Please ensure you have written the field names correctly"
+	
+	if isinstance(name,str)==False or isinstance(temp_value,float)==False :
+		return "Please make sure your input data types are correct. Check if your name is in string and temp is in float."
+	
+	if name=="":
+		return "Please ensure your friend's name is filled up."
 
 	check_name = User.query.filter_by(name=name).first()
 
@@ -58,10 +66,14 @@ def create_temp():
 	try: #select user_id  where name = name
 		user_id = db.session.query(User.id).filter(User.name==name)
 		# User.query(User.id).filter(User.name == name).first()
-		new_temp = Temperature(user_id=user_id, temp_value=temp)
-		db.session.add(new_temp)
-		db.session.commit()
-		return jsonify('new user {} was created'.format(new_temp))
+		if user_id != None:
+			new_temp = Temperature(user_id=user_id, temp_value=temp)
+			db.session.add(new_temp)
+			db.session.commit()
+			return jsonify('new temp record {} was created for user {}'.format(new_temp,name))
+		else:
+			return "Are you sure {} is your friend?".format(name)
+
 
 		# this must be done before adding reviews
 	except Exception as e:
