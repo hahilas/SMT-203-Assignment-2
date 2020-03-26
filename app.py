@@ -30,7 +30,8 @@ def create_user():
 		new_user = User(name=name, contact_number=contact_number)
 		db.session.add(new_user)
 		db.session.commit() # this must be done before adding reviews
-		return jsonify('new user {} was created with id {}'.format(new_user))
+		return jsonify('new user {} was created'.format(new_user))
+
 	except Exception as e:
 		return (str(e))
 	# end your code before this line
@@ -41,33 +42,53 @@ def create_temp():
 
 	# start your code after this line
 
-	# end your code before this line
+	name = request.json['name'] 
+	temp = request.json['temp'] #find if id match based on user's name
 
-@app.route('/friend/', methods=['PUT']) 
-def update_friend():
-	print('update_friend')
+	check_name = User.query.filter_by(name=name).first()
 
-	# start your code after this line
+	if check_name is None:
+		return jsonify('user {} does not exist'.format(name))
+	
+	
+	try: #select user_id  where name = name
+		user_id = db.session.query(User.id).filter(User.name==name)
+		# User.query(User.id).filter(User.name == name).first()
+		new_temp = Temperature(user_id=user_id, temp_value=temp)
+		db.session.add(new_temp)
+		db.session.commit() # this must be done before adding reviews
+		return jsonify('new user {} was created'.format(new_temp))
+	
+	except Exception as e:
+		return (str(e))
 
-	# end your code before this line
+# 	# end your code before this line
 
-@app.route('/user/', methods=['GET']) 
-def get_user():
-	print('get_user')
+# @app.route('/friend/', methods=['PUT']) 
+# def update_friend():
+# 	print('update_friend')
 
-	# start your code after this line
+# 	# start your code after this line
 
-	# end your code before this line
+# 	# end your code before this line
 
-@app.route('/temp/', methods=['GET']) 
-def get_temp():
-	print('get_temp')
+# @app.route('/user/', methods=['GET']) 
+# def get_user():
+# 	print('get_user')
 
-	# start your code after this line
+# 	# start your code after this line
 
-	# end your code before this line
+# 	# end your code before this line
 
-# your code ends here 
+# @app.route('/temp/', methods=['GET']) 
+# def get_temp():
+# 	print('get_temp')
+
+# 	# start your code after this line
+
+# 	# end your code before this line
+
+# # your code ends here 
 
 if __name__ == '__main__':
 	app.run(debug=True)
