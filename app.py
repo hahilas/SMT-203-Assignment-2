@@ -56,9 +56,11 @@ def create_temp():
 		# User.query(User.id).filter(User.name == name).first()
 		new_temp = Temperature(user_id=user_id, temp_value=temp)
 		db.session.add(new_temp)
-		db.session.commit() # this must be done before adding reviews
-		return jsonify('new user {} was created'.format(new_temp))
-	
+		db.session.commit()
+		if len(str(contact_number))==8:
+			return jsonify('new user {}'.format(new_user))
+		else:
+			return "Please type an 8 digit number" # this must be done before adding reviews
 	except Exception as e:
 		return (str(e))
 
