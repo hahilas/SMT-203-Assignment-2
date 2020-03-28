@@ -1,4 +1,9 @@
 Question 2:
-1. Make sure the first number in the contact number starts from 6,8 or 9.
-2. Make sure when a name is added but number is added wrongly, the record is not added to the database. User should still be able to input the number again with the same name withour error.
-3. The person could have made more than 2 types of errors.
+1. Make sure when a name is added but number is added wrongly, the record is not added to the database. User should still be able to input the number again with the same name withour error.
+2. The person could have made more than 2 types of errors.
+
+Question 3:
+1. you should reject negative values for temperature or alphanumeric letters such as "ab13" for temperature. But you do not need to check if the temperature falls within a range, such as between 20 to 44.
+
+Question 7:
+1. Temperature must be in float and also not some rubbish (refer to Question 2)
