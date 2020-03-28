@@ -101,23 +101,22 @@ def get_user():
 	return jsonify([u.serialize() for u in user])
 	# end your code before this line
 
-@app.route('/temp/', methods=['GET']) 
+@app.route('/temp/', methods=['GET'])
 def get_temp():
 	print('get_temp')
 
 	# start your code after this line
-	if 'name' in request.args: #if want to search by description. 
-		name = request.args.get('name') #what does this mean
-		User_ = User.query.filter_by(name=name).first() #to check if it is the same as database #get the first item
-		temp = Temperature.query.filter_by(user_id=User_.id) #gets all the reviews with the menu_id
-		return jsonify([t.serialize() for t in temp])
+	if 'name' in request.args:
+		name = request.args.get('name')
+		requested_user = User.query.filter_by(name=name).first()
+		temperatures = Temperature.query.filter_by(user_id=requested_user.id)
 	else:
-		temp = Temperature.query.all()
-		return jsonify([t.serialize() for t in temp])	
+		temperatures = Temperature.query.all()
+
+	return jsonify([t.serialize() for t in temperatures])	
 	# end your code before this line
 
 # your code ends here 
-
 if __name__ == '__main__':
 	app.run(debug=True)
 
