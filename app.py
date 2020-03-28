@@ -106,13 +106,18 @@ def get_temp():
 	print('get_temp')
 
 	# start your code after this line
+	
 	if 'name' in request.args:
 		name = request.args.get('name')
 		requested_user = User.query.filter_by(name=name).first()
 		temperatures = Temperature.query.filter_by(user_id=requested_user.id)
 	else:
-		temperatures = Temperature.query.all()
-
+		temperatures = Temperature.query.filter_by() #<class 'flask_sqlalchemy.BaseQuery'>
+		
+	if 'threshold' in request.args:
+		threshold = request.args.get('threshold')
+		temperatures = temperatures.filter(Temperature.temp_value > threshold)
+		#filter cannot be applied to list type
 	return jsonify([t.serialize() for t in temperatures])	
 	# end your code before this line
 
