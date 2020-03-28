@@ -97,7 +97,8 @@ def get_user():
 	print('get_user')
 
 	# start your code after this line
-
+	users = User.query.all()
+	return jsonify([u.serialize() for u in users])
 	# end your code before this line
 
 @app.route('/temp/', methods=['GET']) 
