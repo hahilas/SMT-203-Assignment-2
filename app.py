@@ -90,6 +90,27 @@ def update_friend():
 
 	# start your code after this line
 
+	friends = request.json['friends']
+	print(friends)
+	# order = Order.query.get(order_id)
+
+	try: 
+		friend_list = []
+		for friend in friends:
+			# check if item exists
+			user = User.query.filter_by(name=friend).first()
+			if user is None: 
+				return ('{} does not exist'.format(user))
+			else:
+				friend_list.append(friend)
+		if len(friend_list) == 0:
+			return ('cannot have empty food order')
+		user.friends = friend_list
+		db.session.commit() 
+		return jsonify(user.serialize())
+	except Exception as e:
+		return (str(e))
+
 	# end your code before this line
 
 @app.route('/user/', methods=['GET']) 
@@ -101,176 +122,27 @@ def get_user():
 	return jsonify([u.serialize() for u in user])
 	# end your code before this line
 
-@app.route('/temp/', methods=['GET'])
+@app.route('/temp/', methods=['GET']) 
 def get_temp():
 	print('get_temp')
 
 	# start your code after this line
-	
-	if 'name' in request.args:
-		name = request.args.get('name')
-		requested_user = User.query.filter_by(name=name).first()
-		temperatures = Temperature.query.filter_by(user_id=requested_user.id)
-	else:
-		temperatures = Temperature.query.filter_by() #<class 'flask_sqlalchemy.BaseQuery'>
+	if 'name' in request.args: #if want to search by description. 
+		name = request.args.get('name') #what does this mean
+		requested_user = User.query.filter_by(name=name).first() #to check if it is the same as database #get the first item
+		temp = Temperature.query.filter_by(user_id=requested_user.id) #gets all the reviews with the menu_id
 		
+	else:
+		temp = Temperature.query.filter_by()
+
 	if 'threshold' in request.args:
-		threshold = request.args.get('threshold')
-		temperatures = temperatures.filter(Temperature.temp_value > threshold)
-		#filter cannot be applied to list type
-	return jsonify([t.serialize() for t in temperatures])	
+		threshold = request.args.get('threshold') #what does this mean
+		temp = temp.filter(Temperature.temp_value > threshold) #to check if it is the same as database #get the first item
+
+	return jsonify([t.serialize() for t in temp])	
 	# end your code before this line
 
 # your code ends here 
+
 if __name__ == '__main__':
 	app.run(debug=True)
-
-
-		# this must be done before adding reviews
-	# except Exception as e:
-	# 	return (str(e))
-
-# 	# end your code before this line
-
-# @app.route('/friend/', methods=['PUT']) 
-# def update_friend():
-# 	print('update_friend')
-
-# 	# start your code after this line
-
-# 	# end your code before this line
-
-# @app.route('/user/', methods=['GET']) 
-# def get_user():
-# 	print('get_user')
-
-# 	# start your code after this line
-
-# 	# end your code before this line
-
-# @app.route('/temp/', methods=['GET']) 
-# def get_temp():
-# 	print('get_temp')
-
-# 	# start your code after this line
-
-# 	# end your code before this line
-
-# # your code ends here 
-
-# if __name__ == '__main__':
-# 	app.run(debug=True)
-
-
-# # Step 01: import necessary libraries/modules
-# from flask import Flask, jsonify, request
-# from flask_sqlalchemy import SQLAlchemy
-
-# # your code begins here 
-
-# # Step 02: initialize flask app here 
-# app = Flask(__name__)
-# app.debug = True
-
-# # Step 03: add database configurations here
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://asm02_user:password@localhost:5432/asm02'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
-
-# # Step 04: import models
-# from models import User, Temperature
-
-# # Step 05: add routes and their binded functions here
-# @app.route('/user/', methods=['POST']) 
-# def create_user():
-# 	print('create_user')
-
-# 	# start your code after this line
-# 	# get values from request.json 
-# 	name = request.json['name'] 
-# 	contact_number = request.json['contact'] 
-
-# 	try:
-# 		new_user = User(name=name, contact_number=contact_number)
-# 		db.session.add(new_user)
-# 		db.session.commit() # this must be done before adding reviews
-# 		return jsonify('new user {} was created'.format(new_user))
-
-# 	except Exception as e:
-# 		return (str(e))
-# 	# end your code before this line
-
-# @app.route('/temp/', methods=['POST']) 
-# def create_temp():
-# 	print('create_temp')
-
-# 	# start your code after this line
-
-# 	name = request.json['name'] 
-# 	temp = request.json['temp'] #find if id match based on user's name
-
-# 	check_name = User.query.filter_by(name=name).first()
-
-# 	if check_name is None:
-# 		return jsonify('user {} does not exist'.format(name))
-	
-	
-# 	try: #select user_id  where name = name
-# 		user_id = db.session.query(User.id).filter(User.name==name)
-# 		# User.query(User.id).filter(User.name == name).first()
-# 		new_temp = Temperature(user_id=user_id, temp_value=temp, user_name=name)
-# 		db.session.add(new_temp)
-# 		db.session.commit() # this must be done before adding reviews
-# 		return jsonify('new user {} was created'.format(new_temp))
-	
-# 	except Exception as e:
-# 		return (str(e))
-
-# 	# end your code before this line
-
-# # @app.route('/friend/', methods=['PUT']) 
-# # def update_friend():
-# # 	print('update_friend')
-
-# 	# start your code after this line
-
-# 	# end your code before this line
-
-# @app.route('/user/', methods=['GET']) 
-# def get_user():
-# 	print('get_user')
-
-# 	# start your code after this line
-
-# 	if 'id' in request.args: #if it is a dictionary
-# 		id = int(request.args.get('id')) #what does this mean
-# 		user = User.query.filter_by(id=id).first() #to check if it is the same as database
-# 		return jsonify(user.serialize())
-# 	else:
-# 		# user = Temperature.query.filter_by(id=id).first() #filter by the user's id
-# 		# want to check if the id  is the same if it is i want to return only the user's one
-# 		user = User.query.all()
-# 		return jsonify([u.serialize() for u in user])
-
-# # 	# end your code before this line
-
-# # @app.route('/temp/', methods=['GET']) 
-# # def get_temp():
-# # 	print('get_temp')
-
-# # 	# start your code after this line
-
-# # 	if 'id' in request.args: #if it is a dictionary
-# # 		id = int(request.args.get('id')) #what does this mean
-# # 		temp = Temperature.query.filter_by(id=id).first() #to check if it is the same as database
-# # 		return jsonify(temp.serialize())
-# # 	else:
-# # 		temp = Temperature.query.all()
-# # 		return jsonify([t.serialize() for t in temp])
-
-# 	# end your code before this line
-
-# # # your code ends here 
-
-# if __name__ == '__main__':
-# 	app.run(debug=True)
