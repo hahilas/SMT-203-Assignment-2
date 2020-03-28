@@ -12,24 +12,30 @@ class User(db.Model):
 	
 	#one-to-many model
 	temperatures = db.relationship('Temperature', back_populates='user', uselist= True, cascade='all,delete-orphan', lazy=True)
+
 	# end your code before this line
 
 	def __init__(self, name, contact_number,temperatures=None):
 		# start your code after this line
 		self.name = name
 		self.contact_number = contact_number
-		self.temperatures = [] if temperatures is None else reviews
+		self.temperatures = [] if temperatures is None else temperatures
 		# end your code before this line
 
 	def __repr__(self):
 		return '{} was created with id {}'.format(self.name, self.id) 
 		
+	
 	def serialize(self):
 		# start your code after this line
+		#querying all the temp records of a particular user
+		user_temp_data = Temperature.query.filter_by(user_id = self.id).all()
+
 		return {
-			'name': self.name, 
-			'id':self.id,
 			'contact_number': self.contact_number,
+			'id':self.id,
+			'name': self.name, 
+			'temp_logs':[] if self.temperatures == [] else [{"temp":temp_entry.temp_value,"timestamp":temp_entry.timestamp} for temp_entry in user_temp_data]		
 		}
 		# end your code before this line
 
