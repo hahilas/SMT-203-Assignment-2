@@ -58,8 +58,10 @@ class Temperature(db.Model):
 	def serialize(self):
 		# start your code after this line
 		return {
+			'id':self.id,
 			'user_id': self.user_id, 
 			'temp_value': self.temp_value,
 			'timestamp': self.timestamp,
+			'user_name':User.query.filter_by(id=self.user_id).first().name
 		}
 		# end your code before this line
