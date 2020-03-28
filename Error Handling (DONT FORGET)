@@ -1,0 +1,3 @@
+Question 2:
+1. Make sure the first number in the contact number starts from 6,8 or 9.
+2. Make sure when a name is added but number is added wrongly, the record is not added to the database. User should still be able to input the number again with the same name withour error.
