@@ -2,6 +2,11 @@ import datetime
 
 from app import db
 
+friendship_table = db.Table('friendship',
+db.Column('friend_from', db.Integer, db.ForeignKey('user.id'),primary_key=True),
+db.Column('friend_to', db.Integer, db.ForeignKey('user.id'),
+primary_key=True))
+
 class User(db.Model):
 	__tablename__ = 'user'
 
@@ -10,20 +15,25 @@ class User(db.Model):
 	name = db.Column(db.String(80), unique=True, nullable=False)
 	contact_number = db.Column(db.Integer, unique=True, nullable=False)
 	
-	#one-to-many model
+	#one-to-many model btw user and temperature
 	temperatures = db.relationship('Temperature', back_populates='user', uselist= True, cascade='all,delete-orphan', lazy=True)
 
+	# many-to-many model to the same class
+	friends = db.relationship('User', secondary=friendship_table,
+	primaryjoin=id == friendship_table.c.friend_to,
+	secondaryjoin=id==friendship_table.c.friend_from)
 	# end your code before this line
 
-	def __init__(self, name, contact_number,temperatures=None):
+	def __init__(self, name, contact_number,temperatures=None, friends = None):
 		# start your code after this line
 		self.name = name
 		self.contact_number = contact_number
 		self.temperatures = [] if temperatures is None else temperatures
+		self.friends = friends
 		# end your code before this line
 
-	def __repr__(self):
-		return '{} was created with id {}'.format(self.name, self.id) 
+	# def __repr__(self):
+	# 	return '{} was created with id {}'.format(self.name, self.id) 
 		
 	
 	def serialize(self):
@@ -31,12 +41,20 @@ class User(db.Model):
 		#querying all the temp records of a particular user
 		user_temp_data = Temperature.query.filter_by(user_id = self.id).all()
 
+		# return {
+		# 	'contact_number': self.contact_number,
+		# 	'id':self.id,
+		# 	'name': self.name, 
+		# 	'temp_logs':[] if self.temperatures == [] else [{"temp":temp_entry.temp_value,"timestamp":temp_entry.timestamp} for temp_entry in user_temp_data]		
+		# }
 		return {
 			'contact_number': self.contact_number,
+			'friends': self.friends,
 			'id':self.id,
 			'name': self.name, 
 			'temp_logs':[] if self.temperatures == [] else [{"temp":temp_entry.temp_value,"timestamp":temp_entry.timestamp} for temp_entry in user_temp_data]		
 		}
+
 		# end your code before this line
 
 class Temperature(db.Model):
