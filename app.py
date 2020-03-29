@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.debug = True
 
 # Step 03: add database configurations here
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://asm02user:password@localhost:5432/asm02db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://asm02_user:password@localhost:5432/asm02'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -89,64 +89,38 @@ def update_friend():
 	print('update_friend')
 
 	# start your code after this line
+
+	# start your code after this line
 	user = request.json['user']
 	mutual_friends = request.json['friends'] 
-	user = User.query.filter_by(name=user).first()
+	# user = User.query.filter_by(name=user).first()
 
 	try:
 		mutual_friend_list = []
-		for friend in mutual_friends:
-			friend = User.query.filter_by(name=friend).first()
-			if friend is None:
+		for name in mutual_friends:
+			# check_friend = User.query.filter_by(name=friend).first()
+			check_friend = User.query.filter_by(name=name).first()
+			# print(check_friend)
+			contact_number = User.query.filter_by(contact_number=contact_number).first()
+			print(User(name,contact_number).serialize())
+
+			if check_friend is None:
 				return ('There is a person in the friend list who is actually not our mutual friend')
 			else:
-				mutual_friend_list.append(friend)
+				mutual_friend_list.append(name)
 
 		if len(mutual_friend_list) ==0:
 			return []
-
-		user.friends = mutual_friend_list
+				
+		print(mutual_friend_list)
+		User.friends = mutual_friend_list
 		db.session.commit()
-		print(user)
-		return jsonify(user.serialize())
+		print(User(name,contact_number).serialize())
+		return jsonify(User(name,contact_number).serialize())
 		
 	except Exception as e:
 		return (str(e))
 
-		
-	# requested_user = User.query.filter_by(name=user).first()
-	# user_id = requested_user.id
-	# user = User.query.get(user_id)
-	# user.name = user
-	# user.friends = friends
-	# #user.id = user_id
-	# # requested_user.friends.friend_to = friends
-	# # print(requested_user.friends.friend_to)
-	# db.session.commit()
-	# return jsonify(requested_user.serialize())
-
-	
-	# try: 
-	# 	friendship_table.
-	# 	friends_list = []
-	# 	for friend in friends:
-	# 		# check if item exists
-	# 		menu = Menu.query.filter_by(desc=desc).first()
-	# 		if menu is None: 
-	# 			return ('{} does not exist'.format(desc))
-	# 		else:
-	# 			food_item_list.append(menu)
-	# 	if len(food_item_list) == 0:
-	# 		return ('cannot have empty food order')
-	# 	order.food_items = food_item_list
-	# 	db.session.commit() 
-	# 	return jsonify(order.serialize())
-	# except Exception as e:
-	# 	return (str(e))
-	# for f in friends:
-	# 	friend_id = User.query.filter_by(name=f)
-	# 	print(friend_id)	
-	
 	# end your code before this line
 
 @app.route('/user/', methods=['GET']) 
@@ -154,32 +128,34 @@ def get_user():
 	print('get_user')
 
 	# start your code after this line
-	users = User.query.all() #class list
-	return jsonify([u.serialize() for u in users])
+	user = User.query.all()
+	return jsonify([u.serialize() for u in user])
 	# end your code before this line
 
-@app.route('/temp/', methods=['GET'])
+@app.route('/temp/', methods=['GET']) 
 def get_temp():
 	print('get_temp')
 
 	# start your code after this line
-	
-	if 'name' in request.args:
-		name = request.args.get('name')
-		requested_user = User.query.filter_by(name=name).first()
-		temperatures = Temperature.query.filter_by(user_id=requested_user.id)
+	if 'name' in request.args: #if want to search by description. 
+		name = request.args.get('name') #what does this mean
+		User_ = User.query.filter_by(name=name).first() #to check if it is the same as database #get the first item
+		temp = Temperature.query.filter_by(user_id=User_.id) #gets all the reviews with the menu_id
+		return jsonify([t.serialize() for t in temp])
 	else:
-		temperatures = Temperature.query.filter_by() #<class 'flask_sqlalchemy.BaseQuery'>
-		
-	if 'threshold' in request.args:
-		threshold = request.args.get('threshold')
-		temperatures = temperatures.filter(Temperature.temp_value > threshold)
-		#filter cannot be applied to list type
-	return jsonify([t.serialize() for t in temperatures])	
+		temp = Temperature.query.all()
+		return jsonify([t.serialize() for t in temp])	
 	# end your code before this line
 
 # your code ends here 
 
-
 if __name__ == '__main__':
 	app.run(debug=True)
+
+
+		# this must be done before adding reviews
+	# except Exception as e:
+	# 	return (str(e))
+
+# 	# end your code before this line
+
