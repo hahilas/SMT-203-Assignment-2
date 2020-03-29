@@ -2,6 +2,12 @@ import datetime
 
 from app import db
 
+friendship_table = db.Table('friendship',
+db.Column('friend_from', db.Integer, db.ForeignKey('user.id'),
+primary_key=True),
+db.Column('friend_to', db.Integer, db.ForeignKey('user.id'),
+primary_key=True))
+
 class User(db.Model):
 	__tablename__ = 'user'
 
@@ -13,6 +19,10 @@ class User(db.Model):
 	#one-to-many model
 	temperatures = db.relationship('Temperature', back_populates='user', uselist= True, cascade='all,delete-orphan', lazy=True)
 
+	# many-to-many model to the same class
+	friends = db.relationship('User', secondary=friendship_table,
+	primaryjoin=id == friendship_table.c.friend_to,
+	secondaryjoin=id==friendship_table.c.friend_from)
 	# end your code before this line
 
 	def __init__(self, name, contact_number,temperatures=None):
